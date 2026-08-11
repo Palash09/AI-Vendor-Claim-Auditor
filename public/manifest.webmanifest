@@ -1,0 +1,17 @@
+{
+  "name": "AI Vendor Claim Auditor",
+  "short_name": "Claim Auditor",
+  "description": "Cited AI-vendor claim and evidence review.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4f1ea",
+  "theme_color": "#173e35",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

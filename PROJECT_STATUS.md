@@ -55,17 +55,28 @@ production migration is applied. A dedicated free Supabase project provides
 universal email magic-link authentication; its public client configuration and
 explicit callback allow list are configured in Netlify and Supabase.
 
-The canonical hostname is `aiauditor.palasharma.com` and is attached to the
-Netlify project. External setup still remaining: replace the Porkbun parking
-record with a CNAME from `aiauditor` to
-`ai-vendor-claim-auditor.netlify.app`, wait for Netlify HTTPS provisioning, add
-the server-side `OPENAI_API_KEY`, redeploy once with the completed environment,
-and run an authenticated production smoke audit. Keep the Netlify Free hard
-credit limit in place so hosting cannot create an overage charge.
+The canonical hostname is `aiauditor.palasharma.com`. Porkbun DNS points the
+hostname to Netlify, the included Let's Encrypt certificate is active, and HTTP
+redirects to HTTPS. The server-side `OPENAI_API_KEY` is stored as a protected
+Netlify secret in a dedicated OpenAI project and the completed environment has
+been deployed. No automated workflow may purchase credits, change payment
+settings, enable a paid plan, or initiate a billable model request; the owner
+must initiate any paid API usage personally.
+
+The email magic-link flow was found to loop when a mobile email client opened
+the PKCE link outside the browser that initiated sign-in. The production demo
+now uses a one-tap temporary Supabase identity instead: no email or external
+account is required, while every audit remains scoped to a unique authenticated
+user ID. The callback also accepts token-hash verification for a future
+browser-independent email flow.
+
+The public demo is forced to use the conservative local analyzer even though
+the OpenAI key is configured. This prevents guest traffic from generating API
+charges. The first model-assisted audit remains intentionally owner-operated.
 
 ## Recommended next tasks
 
-1. Complete Porkbun DNS, add the OpenAI key, redeploy once, and run one authenticated smoke audit.
+1. Complete one guest-session production smoke audit, then have the owner decide when to enable the first model-assisted audit.
 2. Add free-credit usage monitoring and keep production deploys intentional because each consumes Netlify credits.
 3. Add OCR for scanned PDFs and clearer low-text-document recovery.
 4. Add duplicate-source detection and extracted-text correction with analysis invalidation.

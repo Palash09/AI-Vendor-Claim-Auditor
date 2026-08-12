@@ -48,7 +48,7 @@ export async function getReviewer(): Promise<Reviewer | null> {
 
   const { data, error } = await supabase.auth.getUser();
   const user = data.user;
-  if (error || !user?.email) return null;
+  if (error || !user) return null;
 
   const fullName =
     typeof user.user_metadata?.full_name === "string"
@@ -56,8 +56,8 @@ export async function getReviewer(): Promise<Reviewer | null> {
       : null;
   return {
     userId: user.id,
-    displayName: fullName ?? user.email,
-    email: user.email,
+    displayName: fullName ?? user.email ?? "Guest reviewer",
+    email: user.email ?? "",
     fullName,
   };
 }

@@ -1547,7 +1547,8 @@ footer {
 }
 
 .signin-form button,
-.secondary-signin {
+.secondary-signin,
+.guest-signin {
   min-height: 48px;
   padding: 0 16px;
   border: 0;
@@ -1558,9 +1559,21 @@ footer {
   cursor: pointer;
 }
 
-.signin-form button:disabled {
+.signin-form button:disabled,
+.guest-signin:disabled {
   cursor: wait;
   opacity: 0.65;
+}
+
+.guest-signin {
+  width: 100%;
+}
+
+.demo-access-note {
+  margin: 10px 0 0;
+  color: var(--ink-soft);
+  font-size: 12px;
+  line-height: 1.5;
 }
 
 .secondary-signin {

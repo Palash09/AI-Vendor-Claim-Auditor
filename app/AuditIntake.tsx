@@ -1138,7 +1138,7 @@ function AnalysisPanel({
 
       {analysis.mode === "demo" ? (
         <div className="message notice-message" role="note">
-          No OpenAI API key is connected, so this run used the conservative local demo analyzer. It only surfaces cited claims and treats missing separate support as an evidence gap.
+          AI analysis is disabled for this demo, so this run used the conservative local analyzer. It only surfaces cited claims and treats missing separate support as an evidence gap.
         </div>
       ) : null}
 

@@ -6,6 +6,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { AuditIntake } from "../app/AuditIntake.tsx";
 import { SignInForm } from "../app/sign-in/SignInForm.tsx";
 import { safeReturnPath } from "../app/reviewer-auth.ts";
+import { getOpenAIAnalysisKey } from "../lib/analyze-evidence.ts";
 
 test("server-renders the mobile application shell", async () => {
   const html = renderToStaticMarkup(
@@ -24,14 +25,36 @@ test("server-renders the mobile application shell", async () => {
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
 });
 
-test("renders universal email sign-in without ChatGPT language", () => {
+test("renders one-tap guest demo access without requiring email", () => {
   const html = renderToStaticMarkup(
-    React.createElement(SignInForm, { returnTo: "/" }),
+    React.createElement(SignInForm, { returnTo: "/", enableGuestDemo: true }),
   );
 
-  assert.match(html, /Use any email address/i);
-  assert.match(html, /Email me a sign-in link/i);
+  assert.match(html, /Continue to the demo/i);
+  assert.match(html, /No email required/i);
+  assert.doesNotMatch(html, /Email me a sign-in link/i);
   assert.doesNotMatch(html, /sign in with ChatGPT/i);
+});
+
+test("supports browser-independent token-hash email callbacks", async () => {
+  const callback = await readFile(
+    new URL("../app/auth/callback/route.ts", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(callback, /token_hash/);
+  assert.match(callback, /verifyOtp/);
+});
+
+test("requires an explicit billing-boundary flag before using the OpenAI key", () => {
+  assert.equal(
+    getOpenAIAnalysisKey({ OPENAI_API_KEY: "secret", OPENAI_ANALYSIS_ENABLED: "false" }),
+    null,
+  );
+  assert.equal(
+    getOpenAIAnalysisKey({ OPENAI_API_KEY: "secret", OPENAI_ANALYSIS_ENABLED: "true" }),
+    "secret",
+  );
 });
 
 test("rejects external and protocol-relative authentication return paths", () => {

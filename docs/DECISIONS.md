@@ -101,3 +101,15 @@
 **Decision:** Use `aiauditor.palasharma.com` as the canonical production hostname. Configure Supabase Auth with that origin as its site URL, allow only the production callback, the Netlify fallback callback, and the local-development callback, and keep email magic links as the universal sign-in method.
 
 **Why:** A dedicated subdomain keeps the application independent from the main portfolio website while retaining a recognizable owner-controlled domain. Explicit callback allow-listing prevents authentication redirects to arbitrary origins and preserves a practical fallback while DNS and local development are in progress.
+
+## 2026-08-12 — Require owner action for every financial transaction
+
+**Decision:** Automated development and operations may configure free services and securely provision credentials, but must never purchase credits, modify payment methods, enable paid upgrades, or initiate billable model requests. The application owner must personally initiate paid API usage.
+
+**Why:** Hosting is intentionally hard-capped and OpenAI inference is usage-priced. Keeping financial actions and the first billable request under direct owner control prevents accidental charges while still allowing the production integration to be prepared and verified up to the billing boundary.
+
+## 2026-08-12 — Use temporary guest sessions for the public demo
+
+**Decision:** During MVP testing, make a one-tap Supabase anonymous session the primary access path and hide email magic-link sign-in. Keep each audit scoped to the resulting authenticated user ID. Force the public demo to use the conservative local analyzer even when an OpenAI key is configured.
+
+**Why:** Email magic links using PKCE can fail when a mobile email client opens the link in a different browser context. Anonymous Supabase users still receive unique authenticated identities, so the application can preserve owner isolation without collecting an email address. Disabling model calls prevents guest traffic from creating OpenAI charges. Google sign-in and a browser-independent token-hash email callback remain available as later permanent-account paths.

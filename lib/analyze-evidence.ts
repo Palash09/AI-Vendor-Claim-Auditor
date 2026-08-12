@@ -48,11 +48,24 @@ export type GeneratedAnalysis = {
   questions: string[];
 };
 
+export function getOpenAIAnalysisKey(
+  environment: {
+    OPENAI_ANALYSIS_ENABLED?: string;
+    OPENAI_API_KEY?: string;
+  },
+): string | null {
+  if (environment.OPENAI_ANALYSIS_ENABLED !== "true") return null;
+  return environment.OPENAI_API_KEY?.trim() || null;
+}
+
 export async function analyzeEvidence(
   audit: typeof audits.$inferSelect,
   fragments: EvidenceFragment[],
 ): Promise<GeneratedAnalysis> {
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = getOpenAIAnalysisKey({
+    OPENAI_ANALYSIS_ENABLED: process.env.OPENAI_ANALYSIS_ENABLED,
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+  });
   if (apiKey && fragments.length > 0) {
     try {
       return await analyzeWithOpenAI(apiKey, audit, fragments);

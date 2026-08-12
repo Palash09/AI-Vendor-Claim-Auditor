@@ -1,4 +1,3 @@
-import { env } from "cloudflare:workers";
 import { z } from "zod";
 import type { audits } from "@/db/schema";
 import type { EvidenceFragment } from "@/lib/evidence-extraction";
@@ -53,7 +52,7 @@ export async function analyzeEvidence(
   audit: typeof audits.$inferSelect,
   fragments: EvidenceFragment[],
 ): Promise<GeneratedAnalysis> {
-  const apiKey = (env as Cloudflare.Env & { OPENAI_API_KEY?: string }).OPENAI_API_KEY;
+  const apiKey = process.env.OPENAI_API_KEY;
   if (apiKey && fragments.length > 0) {
     try {
       return await analyzeWithOpenAI(apiKey, audit, fragments);
@@ -69,8 +68,7 @@ async function analyzeWithOpenAI(
   audit: typeof audits.$inferSelect,
   fragments: EvidenceFragment[],
 ): Promise<GeneratedAnalysis> {
-  const model =
-    (env as Cloudflare.Env & { OPENAI_MODEL?: string }).OPENAI_MODEL ?? "gpt-5.6-terra";
+  const model = process.env.OPENAI_MODEL ?? "gpt-5.6-terra";
   const packet = fragments.slice(0, 120).map((fragment) => ({
     id: fragment.id,
     sourceId: fragment.sourceId,
@@ -115,7 +113,7 @@ async function analyzeWithOpenAI(
         },
       },
     }),
-    signal: AbortSignal.timeout(60_000),
+    signal: AbortSignal.timeout(45_000),
   });
   const responseBody = (await response.json()) as {
     error?: { message?: string };

@@ -1,9 +1,9 @@
-import { env } from "cloudflare:workers";
 import { and, eq } from "drizzle-orm";
-import { getChatGPTUser } from "@/app/chatgpt-auth";
+import { getReviewer } from "@/app/reviewer-auth";
 import { getDb } from "@/db";
 import { ensureSchema } from "@/db/ensure-schema";
 import { sources } from "@/db/schema";
+import { deleteEvidenceFile } from "@/lib/evidence-storage";
 import { jsonError } from "@/lib/http";
 
 type RouteContext = {
@@ -11,7 +11,7 @@ type RouteContext = {
 };
 
 export async function DELETE(_request: Request, context: RouteContext) {
-  const user = await getChatGPTUser();
+  const user = await getReviewer();
   if (!user) return jsonError("Sign in to remove evidence.", 401);
 
   await ensureSchema();
@@ -30,8 +30,8 @@ export async function DELETE(_request: Request, context: RouteContext) {
     .limit(1);
 
   if (!source) return jsonError("Source not found.", 404);
-  if (source.storageKey && env.EVIDENCE_BUCKET) {
-    await env.EVIDENCE_BUCKET.delete(source.storageKey);
+  if (source.storageKey) {
+    await deleteEvidenceFile(source.storageKey);
   }
 
   await db

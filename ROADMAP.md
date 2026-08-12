@@ -26,11 +26,11 @@ The application assesses only the supplied materials. It does not determine whet
 The implementation will use these defaults unless testing reveals a concrete blocker:
 
 - **Delivery:** Hosted, installable progressive web application; no separate native iOS or Android application for the MVP
-- **Application:** Next.js App Router conventions through the Vinext runtime with TypeScript, server-rendered routes, and server-side APIs
+- **Application:** Native Next.js App Router with TypeScript, server-rendered routes, and server-side APIs on Netlify
 - **Interface:** Mobile-first React components, Tailwind CSS design tokens, accessible semantic controls, and progressive enhancement for tablet and desktop
 - **Access:** App-owned Supabase Auth using email magic links and optional Google sign-in, with every audit scoped to the authenticated reviewer; organization and multi-role administration remain post-MVP
-- **Database:** Cloudflare D1 with Drizzle ORM and versioned SQLite migrations
-- **File storage:** Private Cloudflare R2 object storage addressed only from authenticated server routes
+- **Database:** Netlify Database (Postgres) with Drizzle ORM and versioned SQL migrations
+- **File storage:** Private Netlify Blobs addressed only from authenticated server routes
 - **Model:** OpenAI Responses API with GPT-5.6 Terra as the initial balanced model and Structured Outputs for schema-constrained records
 - **Model data handling:** Send extracted text rather than uploading source files to the model provider, set Responses API requests to `store: false`, and do not use provider-hosted conversation state
 - **Model boundary:** A provider adapter so model or provider changes do not affect the audit domain layer
@@ -39,7 +39,7 @@ The implementation will use these defaults unless testing reveals a concrete blo
 - **Processing:** Server-persisted, idempotent pipeline steps with resumable status; introduce a dedicated queue only when deployment limits require it
 - **Reports:** Deterministic printable HTML, PDF export, and the mobile Web Share API where supported
 - **Testing:** Vitest for unit and integration tests, Playwright for end-to-end and responsive-browser tests, plus fixture-based pipeline evaluations
-- **Deployment:** Direct Cloudflare Workers deployment with D1 and R2 bindings; access to the application does not require a ChatGPT account
+- **Deployment:** Netlify Free with a hard 300-credit monthly limit and no automatic overage charges; access does not require a ChatGPT account
 - **MVP retention:** Allow immediate user deletion; otherwise delete the audit, uploads, extracted text, findings, and generated reports 72 hours after last activity, with a hard maximum of seven days after audit creation
 
 This is a web application first. A reviewer should be able to open it from a phone browser, install it to the home screen, upload from the device file picker, leave during processing, return to the same audit, review findings, and share or download the approved brief.
@@ -88,7 +88,7 @@ The estimates below are relative planning ranges for one experienced full-stack 
 **Build**
 
 - Scaffold the selected Next.js and TypeScript application, environment configuration, database migrations, test runner, and CI checks.
-- Configure Supabase Auth, direct Cloudflare Workers deployment, D1, Drizzle ORM, private R2 storage, and the OpenAI provider adapter.
+- Configure Supabase Auth, Netlify deployment, Netlify Database, Drizzle ORM, private Netlify Blobs, and the OpenAI provider adapter.
 - Create provider interfaces for document extraction, model generation, storage, and report rendering.
 - Define the audit state machine: draft, extracting, analyzing, review required, approved, export ready, failed, and deleted.
 - Define versioned schemas for the core records and model responses.

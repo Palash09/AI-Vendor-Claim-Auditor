@@ -1,6 +1,6 @@
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
-import { getChatGPTUser } from "@/app/chatgpt-auth";
+import { getReviewer } from "@/app/reviewer-auth";
 import { getDb } from "@/db";
 import { ensureSchema } from "@/db/ensure-schema";
 import { analysisResults, audits, sourceFragments } from "@/db/schema";
@@ -22,7 +22,7 @@ const updateSchema = z.object({
 type RouteContext = { params: Promise<{ auditId: string; findingId: string }> };
 
 export async function PATCH(request: Request, context: RouteContext) {
-  const user = await getChatGPTUser();
+  const user = await getReviewer();
   if (!user) return jsonError("Sign in to review this finding.", 401);
   const input = updateSchema.safeParse(await request.json());
   if (!input.success) return validationError(input.error);

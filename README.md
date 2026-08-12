@@ -58,10 +58,13 @@ npm run verify
 ```
 
 The application works without an OpenAI API key by using a clearly labeled,
-conservative local analyzer. To test model-assisted Structured Outputs, copy
-`.dev.vars.example` to `.dev.vars` and add a project-scoped API key. Never
-commit that file. Hosted runtime values are managed through the hosting
-environment, not stored in this repository.
+conservative local analyzer. Copy `.env.example` to `.env.local` for local
+configuration. Netlify injects `NETLIFY_DB_URL` when its managed database is
+enabled; Supabase provides the public URL and publishable key used by email
+magic-link authentication. Never commit real credentials.
+
+Production uses Netlify Free, Netlify Database, and private Netlify Blobs. Keep
+the free plan's hard monthly credit limit and do not enable paid auto recharge.
 
 ## Analysis modes
 

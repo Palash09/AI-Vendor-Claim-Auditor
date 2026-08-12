@@ -1,18 +1,18 @@
-import { env } from "cloudflare:workers";
 import { and, eq } from "drizzle-orm";
-import { getChatGPTUser } from "@/app/chatgpt-auth";
+import { getReviewer } from "@/app/reviewer-auth";
 import { getDb } from "@/db";
 import { ensureSchema } from "@/db/ensure-schema";
 import { analysisResults, audits, sourceFragments, sources } from "@/db/schema";
 import { parseAnalysisResult } from "@/lib/analysis-storage";
 import { updateAuditSchema } from "@/lib/audit-schema";
+import { deleteEvidenceFiles } from "@/lib/evidence-storage";
 import { jsonError, validationError } from "@/lib/http";
 import { refreshedExpiry } from "@/lib/retention";
 
 type RouteContext = { params: Promise<{ auditId: string }> };
 
 export async function GET(_request: Request, context: RouteContext) {
-  const user = await getChatGPTUser();
+  const user = await getReviewer();
   if (!user) return jsonError("Sign in to view this audit.", 401);
 
   await ensureSchema();
@@ -69,7 +69,7 @@ export async function GET(_request: Request, context: RouteContext) {
 }
 
 export async function PATCH(request: Request, context: RouteContext) {
-  const user = await getChatGPTUser();
+  const user = await getReviewer();
   if (!user) return jsonError("Sign in to update this audit.", 401);
 
   const result = updateAuditSchema.safeParse(await request.json());
@@ -118,7 +118,7 @@ export async function PATCH(request: Request, context: RouteContext) {
 }
 
 export async function DELETE(_request: Request, context: RouteContext) {
-  const user = await getChatGPTUser();
+  const user = await getReviewer();
   if (!user) return jsonError("Sign in to delete this audit.", 401);
 
   await ensureSchema();
@@ -141,8 +141,8 @@ export async function DELETE(_request: Request, context: RouteContext) {
   const keys = sourceRecords.flatMap((source) =>
     source.storageKey ? [source.storageKey] : [],
   );
-  if (keys.length > 0 && env.EVIDENCE_BUCKET) {
-    await env.EVIDENCE_BUCKET.delete(keys);
+  if (keys.length > 0) {
+    await deleteEvidenceFiles(keys);
   }
 
   return new Response(null, { status: 204 });

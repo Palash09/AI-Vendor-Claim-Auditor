@@ -27,6 +27,9 @@ Up to three supporting documents or URLs, such as:
 - Evaluation report
 - Written sales response
 
+Pilot uploads are limited to 4 MB per file so binary requests remain within
+Netlify Free's function payload ceiling.
+
 ## Claim domains
 
 Review only these five domains in version one:
@@ -129,7 +132,7 @@ Keep the first implementation simple:
 - Short-lived hosted storage with immediate deletion, 72-hour inactivity expiry, and a seven-day hard maximum
 - No background jobs unless document size makes them necessary
 
-The selected baseline is a TypeScript application using Next.js App Router conventions through Vinext, direct Cloudflare Workers hosting, Supabase Auth, Cloudflare D1 and R2 with Drizzle ORM, Zod schemas, PDF.js and Readability-based extraction, and the OpenAI Responses API behind a provider adapter. See [ROADMAP.md](ROADMAP.md) for the complete engineering and mobile requirements.
+The selected baseline is a TypeScript application using native Next.js App Router on Netlify, Supabase Auth, Netlify Database (Postgres) with Drizzle ORM, private Netlify Blobs, Zod schemas, PDF.js and Readability-based extraction, and the OpenAI Responses API behind a provider adapter. The pilot stays on Netlify's free plan with its hard monthly credit limit. See [ROADMAP.md](ROADMAP.md) for the complete engineering and mobile requirements.
 
 ## Mobile-first requirement
 

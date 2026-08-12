@@ -1,13 +1,26 @@
-import { env } from "cloudflare:workers";
-import { drizzle } from "drizzle-orm/d1";
+import { getConnectionString } from "@netlify/database";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 import * as schema from "./schema";
 
+let database: ReturnType<typeof createDatabase> | null = null;
+
 export function getDb() {
-  if (!env.DB) {
+  database ??= createDatabase();
+  return database;
+}
+
+function createDatabase() {
+  const connectionString =
+    process.env.NETLIFY_DB_URL ??
+    process.env.DATABASE_URL ??
+    getConnectionString();
+  if (!connectionString) {
     throw new Error(
-      "Cloudflare D1 binding `DB` is unavailable. Set the `d1` field in .openai/hosting.json to `DB` or let your control plane inject the real binding values before using the database."
+      "Netlify Database is unavailable. Run through `netlify dev` or set NETLIFY_DB_URL for local development.",
     );
   }
 
-  return drizzle(env.DB, { schema });
+  const client = postgres(connectionString, { max: 1, prepare: false });
+  return drizzle(client, { schema });
 }

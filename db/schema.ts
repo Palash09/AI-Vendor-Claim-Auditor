@@ -1,4 +1,4 @@
-import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { index, integer, pgTable, text } from "drizzle-orm/pg-core";
 
 export const auditStatuses = [
   "draft",
@@ -23,7 +23,7 @@ export const decisionImpacts = ["low", "medium", "high"] as const;
 export const sourceKinds = ["url", "file"] as const;
 export const sourceStatuses = ["uploaded", "pending", "failed"] as const;
 
-export const audits = sqliteTable(
+export const audits = pgTable(
   "audits",
   {
     id: text("id").primaryKey(),
@@ -49,7 +49,7 @@ export const audits = sqliteTable(
   ],
 );
 
-export const sources = sqliteTable(
+export const sources = pgTable(
   "sources",
   {
     id: text("id").primaryKey(),
@@ -75,7 +75,7 @@ export const sources = sqliteTable(
   ],
 );
 
-export const analysisResults = sqliteTable(
+export const analysisResults = pgTable(
   "analysis_results",
   {
     auditId: text("audit_id")
@@ -93,7 +93,7 @@ export const analysisResults = sqliteTable(
   (table) => [index("idx_analysis_results_owner").on(table.ownerId)],
 );
 
-export const sourceFragments = sqliteTable(
+export const sourceFragments = pgTable(
   "source_fragments",
   {
     id: text("id").primaryKey(),

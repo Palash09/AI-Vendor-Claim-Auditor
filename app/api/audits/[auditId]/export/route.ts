@@ -1,5 +1,5 @@
 import { and, eq } from "drizzle-orm";
-import { getChatGPTUser } from "@/app/chatgpt-auth";
+import { getReviewer } from "@/app/reviewer-auth";
 import { getDb } from "@/db";
 import { ensureSchema } from "@/db/ensure-schema";
 import { analysisResults, audits } from "@/db/schema";
@@ -10,7 +10,7 @@ import { jsonError } from "@/lib/http";
 type RouteContext = { params: Promise<{ auditId: string }> };
 
 export async function GET(request: Request, context: RouteContext) {
-  const user = await getChatGPTUser();
+  const user = await getReviewer();
   if (!user) return jsonError("Sign in to export this review.", 401);
   await ensureSchema();
   const { auditId } = await context.params;

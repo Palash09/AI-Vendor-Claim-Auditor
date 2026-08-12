@@ -1,5 +1,5 @@
-import { env } from "cloudflare:workers";
 import type { audits, sources } from "@/db/schema";
+import { getEvidenceFile } from "@/lib/evidence-storage";
 
 const MAX_DOCUMENT_CHARS = 40_000;
 const MAX_FRAGMENT_CHARS = 1_800;
@@ -50,15 +50,13 @@ export async function extractAuditEvidence(
       continue;
     }
 
-    if (!source.storageKey || !env.EVIDENCE_BUCKET) {
+    if (!source.storageKey) {
       warnings.push(`${source.title}: the uploaded file could not be read.`);
       continue;
     }
 
     try {
-      const object = await env.EVIDENCE_BUCKET.get(source.storageKey);
-      if (!object) throw new Error("File is no longer available");
-      const bytes = new Uint8Array(await object.arrayBuffer());
+      const bytes = new Uint8Array(await getEvidenceFile(source.storageKey));
       let text: string;
       if (source.contentType === "application/pdf") {
         const { extractText } = await import("unpdf");

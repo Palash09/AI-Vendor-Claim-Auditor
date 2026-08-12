@@ -1,15 +1,17 @@
-import { env } from "cloudflare:workers";
 import { and, count, eq } from "drizzle-orm";
-import { getChatGPTUser } from "@/app/chatgpt-auth";
+import { getReviewer } from "@/app/reviewer-auth";
 import { getDb } from "@/db";
 import { ensureSchema } from "@/db/ensure-schema";
 import { audits, sources } from "@/db/schema";
 import { urlSourceSchema } from "@/lib/audit-schema";
+import { putEvidenceFile } from "@/lib/evidence-storage";
 import { jsonError, validationError } from "@/lib/http";
 import { refreshedExpiry } from "@/lib/retention";
 
 const MAX_SOURCE_COUNT = 3;
-const MAX_FILE_BYTES = 10 * 1_024 * 1_024;
+// Netlify Functions base64-encode binary requests and effectively cap them at
+// about 4.5 MB. Keep room for multipart form metadata.
+const MAX_FILE_BYTES = 4 * 1_024 * 1_024;
 const ACCEPTED_FILE_TYPES = new Set([
   "application/pdf",
   "text/plain",
@@ -19,7 +21,7 @@ const ACCEPTED_FILE_TYPES = new Set([
 type RouteContext = { params: Promise<{ auditId: string }> };
 
 export async function POST(request: Request, context: RouteContext) {
-  const user = await getChatGPTUser();
+  const user = await getReviewer();
   if (!user) return jsonError("Sign in to add evidence.", 401);
 
   await ensureSchema();
@@ -78,17 +80,10 @@ export async function POST(request: Request, context: RouteContext) {
     return jsonError("Use a PDF, TXT, or Markdown file.", 415);
   }
   if (file.size > MAX_FILE_BYTES) {
-    return jsonError("Files must be 10 MB or smaller.", 413);
+    return jsonError("Files must be 4 MB or smaller on the free pilot.", 413);
   }
-  if (!env.EVIDENCE_BUCKET) {
-    return jsonError("Private evidence storage is unavailable.", 503);
-  }
-
   const storageKey = `audits/${auditId}/${sourceId}`;
-  await env.EVIDENCE_BUCKET.put(storageKey, file.stream(), {
-    httpMetadata: { contentType: file.type },
-    customMetadata: { ownerId: user.userId, auditId },
-  });
+  await putEvidenceFile(storageKey, file, { ownerId: user.userId, auditId });
 
   const source = {
     id: sourceId,

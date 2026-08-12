@@ -89,3 +89,9 @@
 **Decision:** Deploy the application directly to Cloudflare Workers and replace Sites-managed ChatGPT identity headers with app-owned Supabase Auth. Offer email magic-link sign-in as the universal baseline and optionally add Google sign-in. Retain Cloudflare D1 and private R2 so the migration does not require replacing the application's database and evidence storage.
 
 **Why:** Application users should not need a ChatGPT account. Supabase Auth supports standalone JWT-based authentication, email magic links, one-time passwords, and social providers, while direct Workers deployment preserves the current mobile-first edge application and its owner-scoped D1/R2 data model. This supersedes the 2026-08-11 Sites deployment baseline; that earlier entry remains as decision history.
+
+## 2026-08-12 — Use Netlify's hard-capped free plan
+
+**Decision:** Host the pilot on Netlify Free using native Next.js, Netlify Database for Postgres records, and private Netlify Blobs for evidence files. Keep Supabase Auth for universal email magic-link login. Do not enable paid Netlify credit recharge. This supersedes the direct Cloudflare Workers target above while retaining the earlier entries as decision history.
+
+**Why:** The pilot budget permits custom-domain and OpenAI API costs but no additional hosting charge. Netlify Free has a fixed monthly credit limit that pauses projects instead of creating an overage bill. Consolidating the runtime, relational database, and blob storage on Netlify also avoids Cloudflare's free Worker CPU ceiling for server-side document extraction.

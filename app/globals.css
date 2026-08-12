@@ -1506,6 +1506,78 @@ footer {
   line-height: 1.5;
 }
 
+.signin-shell {
+  width: min(560px, 100%);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+  display: grid;
+  align-content: start;
+  gap: 42px;
+}
+
+.signin-card {
+  padding: 28px 20px;
+  border: 1px solid rgba(23, 62, 53, 0.14);
+  border-radius: 22px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.signin-card h1 {
+  font-size: clamp(34px, 10vw, 48px);
+}
+
+.signin-form {
+  display: grid;
+  gap: 10px;
+}
+
+.signin-form label {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.signin-form input {
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-small);
+  background: #fff;
+}
+
+.signin-form button,
+.secondary-signin {
+  min-height: 48px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--radius-small);
+  background: var(--forest);
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.signin-form button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.secondary-signin {
+  width: 100%;
+  margin-top: 12px;
+  border: 1px solid var(--forest);
+  background: transparent;
+  color: var(--forest);
+}
+
+.signin-message {
+  margin: 14px 0 0;
+  color: var(--ink-soft);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 @media (min-width: 600px) {
   .page-frame {
     padding-inline: 24px;
@@ -1554,6 +1626,14 @@ footer {
   footer {
     padding-inline: 28px;
     grid-template-columns: 1fr auto;
+  }
+
+  .signin-shell {
+    padding-top: 42px;
+  }
+
+  .signin-card {
+    padding: 38px;
   }
 }
 

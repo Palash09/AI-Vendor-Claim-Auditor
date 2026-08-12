@@ -1,5 +1,5 @@
 import { desc, eq } from "drizzle-orm";
-import { getChatGPTUser } from "@/app/chatgpt-auth";
+import { getReviewer } from "@/app/reviewer-auth";
 import { getDb } from "@/db";
 import { ensureSchema } from "@/db/ensure-schema";
 import { audits } from "@/db/schema";
@@ -8,7 +8,7 @@ import { jsonError, validationError } from "@/lib/http";
 import { initialExpiry } from "@/lib/retention";
 
 export async function GET() {
-  const user = await getChatGPTUser();
+  const user = await getReviewer();
   if (!user) return jsonError("Sign in to view audits.", 401);
 
   await ensureSchema();
@@ -24,7 +24,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const user = await getChatGPTUser();
+  const user = await getReviewer();
   if (!user) return jsonError("Sign in to create an audit.", 401);
 
   const result = createAuditSchema.safeParse(await request.json());

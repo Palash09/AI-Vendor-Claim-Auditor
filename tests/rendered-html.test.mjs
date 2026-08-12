@@ -1,53 +1,43 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
-
-async function render() {
-  const workerUrl = new URL("../dist/server/index.js", import.meta.url);
-  workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
-  const { default: worker } = await import(workerUrl.href);
-
-  return worker.fetch(
-    new Request("http://localhost/", {
-      headers: {
-        accept: "text/html",
-        "oai-authenticated-user-id": "test-reviewer",
-        "oai-authenticated-user-email": "reviewer@example.test",
-      },
-    }),
-    {
-      ASSETS: {
-        fetch: async () => new Response("Not found", { status: 404 }),
-      },
-    },
-    {
-      waitUntil() {},
-      passThroughOnException() {},
-    },
-  );
-}
+import React from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { AuditIntake } from "../app/AuditIntake.tsx";
+import { SignInForm } from "../app/sign-in/SignInForm.tsx";
+import { safeReturnPath } from "../app/reviewer-auth.ts";
 
 test("server-renders the mobile application shell", async () => {
-  const response = await render();
-  assert.equal(response.status, 200);
-  assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
+  const html = renderToStaticMarkup(
+    React.createElement(AuditIntake, { reviewerName: "Test reviewer" }),
+  );
+  const layout = await readFile(new URL("../app/layout.tsx", import.meta.url), "utf8");
+  const manifest = await readFile(
+    new URL("../public/manifest.webmanifest", import.meta.url),
+    "utf8",
+  );
 
-  const html = await response.text();
-  assert.match(html, /<title>Claim Auditor — AI vendor evidence review<\/title>/i);
+  assert.match(layout, /Claim Auditor — AI vendor evidence review/i);
   assert.match(html, /Find the questions hidden in vendor documents/i);
-  assert.match(html, /manifest\.webmanifest/i);
+  assert.match(layout, /manifest\.webmanifest/i);
+  assert.match(manifest, /"display"\s*:\s*"standalone"/i);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
 });
 
-test("redirects anonymous production visitors to sign in", async () => {
-  const workerUrl = new URL("../dist/server/index.js", import.meta.url);
-  workerUrl.searchParams.set("anonymous", `${process.pid}-${Date.now()}`);
-  const { default: worker } = await import(workerUrl.href);
-  const response = await worker.fetch(
-    new Request("http://localhost/", { headers: { accept: "text/html" } }),
-    { ASSETS: { fetch: async () => new Response("Not found", { status: 404 }) } },
-    { waitUntil() {}, passThroughOnException() {} },
+test("renders universal email sign-in without ChatGPT language", () => {
+  const html = renderToStaticMarkup(
+    React.createElement(SignInForm, { returnTo: "/" }),
   );
 
-  assert.equal(response.status, 307);
-  assert.match(response.headers.get("location") ?? "", /^\/signin-with-chatgpt/);
+  assert.match(html, /Use any email address/i);
+  assert.match(html, /Email me a sign-in link/i);
+  assert.doesNotMatch(html, /sign in with ChatGPT/i);
+});
+
+test("rejects external and protocol-relative authentication return paths", () => {
+  assert.equal(safeReturnPath("/audits/example?step=review"), "/audits/example?step=review");
+  assert.equal(safeReturnPath("https://attacker.example/steal"), "/");
+  assert.equal(safeReturnPath("//attacker.example/steal"), "/");
+  assert.equal(safeReturnPath("/sign-in?returnTo=/sign-in"), "/");
+  assert.equal(safeReturnPath("/auth/callback?code=untrusted"), "/");
 });

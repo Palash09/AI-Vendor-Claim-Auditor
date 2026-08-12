@@ -12,6 +12,7 @@
     "test": "npm run build && node --test tests/*.test.mjs",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
+    "verify": "npm run typecheck && npm run lint && npm test",
     "db:generate": "drizzle-kit generate"
   },
   "dependencies": {

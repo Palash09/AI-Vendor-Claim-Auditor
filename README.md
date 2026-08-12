@@ -42,6 +42,35 @@ Future Codex tasks should also follow [AGENTS.md](AGENTS.md).
 - Avoid legal, compliance, safety, or purchasing verdicts.
 - Validate the workflow with real buyers before adding platform complexity.
 
+## Run and verify locally
+
+Install dependencies and start the mobile-first application:
+
+```bash
+npm install
+npm run dev
+```
+
+Run the full build, type, lint, and guardrail test suite before pushing:
+
+```bash
+npm run verify
+```
+
+The application works without an OpenAI API key by using a clearly labeled,
+conservative local analyzer. To test model-assisted Structured Outputs, copy
+`.dev.vars.example` to `.dev.vars` and add a project-scoped API key. Never
+commit that file. Hosted runtime values are managed through the hosting
+environment, not stored in this repository.
+
+## Analysis modes
+
+- **Local demo analysis:** no API key required; extracts exact cited claims and
+  treats the absence of separate support as an evidence gap.
+- **Model-assisted analysis:** uses the OpenAI Responses API to compare claims
+  with supplied evidence across the five MVP domains. Every retained result is
+  still schema-validated, citation-checked, and subject to human approval.
+
 ## Using this folder in Codex
 
 Add this folder as a local project in the Codex Projects view and make it the primary folder. New tasks will then discover `AGENTS.md` and the project documentation automatically.

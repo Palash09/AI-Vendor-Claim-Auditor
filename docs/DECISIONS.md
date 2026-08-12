@@ -95,3 +95,9 @@
 **Decision:** Host the pilot on Netlify Free using native Next.js, Netlify Database for Postgres records, and private Netlify Blobs for evidence files. Keep Supabase Auth for universal email magic-link login. Do not enable paid Netlify credit recharge. This supersedes the direct Cloudflare Workers target above while retaining the earlier entries as decision history.
 
 **Why:** The pilot budget permits custom-domain and OpenAI API costs but no additional hosting charge. Netlify Free has a fixed monthly credit limit that pauses projects instead of creating an overage bill. Consolidating the runtime, relational database, and blob storage on Netlify also avoids Cloudflare's free Worker CPU ceiling for server-side document extraction.
+
+## 2026-08-12 — Publish the application at aiauditor.palasharma.com
+
+**Decision:** Use `aiauditor.palasharma.com` as the canonical production hostname. Configure Supabase Auth with that origin as its site URL, allow only the production callback, the Netlify fallback callback, and the local-development callback, and keep email magic links as the universal sign-in method.
+
+**Why:** A dedicated subdomain keeps the application independent from the main portfolio website while retaining a recognizable owner-controlled domain. Explicit callback allow-listing prevents authentication redirects to arbitrary origins and preserves a practical fallback while DNS and local development are in progress.

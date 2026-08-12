@@ -49,14 +49,23 @@ File uploads are capped at 4 MB because Netlify's buffered function payload is
 6 MB and binary requests gain base64 overhead. Model calls time out at 45
 seconds so the route can finish within Netlify's 60-second synchronous limit.
 
-External setup remains: connect the GitHub repository to a Netlify Free project,
-provision its database, configure Supabase public credentials and callback URLs,
-add the server-side OpenAI key, and attach the custom domain. Keep the Netlify
-Free hard credit limit in place so hosting cannot create an overage charge.
+The GitHub repository is connected to the Netlify Free project and its first
+production deployment succeeded. Netlify Database is provisioned and the
+production migration is applied. A dedicated free Supabase project provides
+universal email magic-link authentication; its public client configuration and
+explicit callback allow list are configured in Netlify and Supabase.
+
+The canonical hostname is `aiauditor.palasharma.com` and is attached to the
+Netlify project. External setup still remaining: replace the Porkbun parking
+record with a CNAME from `aiauditor` to
+`ai-vendor-claim-auditor.netlify.app`, wait for Netlify HTTPS provisioning, add
+the server-side `OPENAI_API_KEY`, redeploy once with the completed environment,
+and run an authenticated production smoke audit. Keep the Netlify Free hard
+credit limit in place so hosting cannot create an overage charge.
 
 ## Recommended next tasks
 
-1. Connect Netlify and Supabase, apply the production database migration, and run one authenticated smoke audit.
+1. Complete Porkbun DNS, add the OpenAI key, redeploy once, and run one authenticated smoke audit.
 2. Add free-credit usage monitoring and keep production deploys intentional because each consumes Netlify credits.
 3. Add OCR for scanned PDFs and clearer low-text-document recovery.
 4. Add duplicate-source detection and extracted-text correction with analysis invalidation.

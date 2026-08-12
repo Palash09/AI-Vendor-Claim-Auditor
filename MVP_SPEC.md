@@ -125,11 +125,11 @@ Keep the first implementation simple:
 - Structured model output validated against a schema
 - Retrieval limited to the supplied packet
 - A deterministic report template
-- Sites-managed sign-in and private per-reviewer audits
+- App-owned email magic-link authentication, with optional Google sign-in, and private per-reviewer audits
 - Short-lived hosted storage with immediate deletion, 72-hour inactivity expiry, and a seven-day hard maximum
 - No background jobs unless document size makes them necessary
 
-The selected baseline is a TypeScript application using Next.js App Router conventions through Vinext, Cloudflare D1 and R2 with Drizzle ORM, Zod schemas, PDF.js and Readability-based extraction, and the OpenAI Responses API behind a provider adapter. See [ROADMAP.md](ROADMAP.md) for the complete engineering and mobile requirements.
+The selected baseline is a TypeScript application using Next.js App Router conventions through Vinext, direct Cloudflare Workers hosting, Supabase Auth, Cloudflare D1 and R2 with Drizzle ORM, Zod schemas, PDF.js and Readability-based extraction, and the OpenAI Responses API behind a provider adapter. See [ROADMAP.md](ROADMAP.md) for the complete engineering and mobile requirements.
 
 ## Mobile-first requirement
 

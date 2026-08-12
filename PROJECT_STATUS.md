@@ -37,12 +37,20 @@ MVP feature-complete locally. The end-to-end workflow runs from mobile intake th
 - Primary buyer role
 - Pricing beyond pilot hypotheses
 
+## Hosting transition
+
+The product will not use ChatGPT-gated Sites authentication. The target is a
+publicly reachable Cloudflare Workers application with app-owned Supabase Auth
+(email magic link first, Google sign-in optional), while retaining D1 and R2.
+The current local build still contains the earlier Sites header adapter and
+must be migrated before a universal-login production deployment.
+
 ## Recommended next tasks
 
-1. Add OCR for scanned PDFs and clearer low-text-document recovery.
-2. Add duplicate-source detection and extracted-text correction with analysis invalidation.
-3. Add route-level automated fixtures for remote HTML, text-file, and PDF packets.
-4. Add audit history and question-list editing after pilot evidence supports them.
+1. Replace the Sites header adapter with Supabase Auth and add direct Cloudflare Workers deployment configuration.
+2. Add OCR for scanned PDFs and clearer low-text-document recovery.
+3. Add duplicate-source detection and extracted-text correction with analysis invalidation.
+4. Add route-level automated fixtures for remote HTML, text-file, and PDF packets.
 5. Add operational logging and error monitoring before a broader production release.
 
 ## First implementation milestone

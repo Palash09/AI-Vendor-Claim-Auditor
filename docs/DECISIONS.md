@@ -83,3 +83,9 @@
 **Decision:** Generate a deterministic Markdown decision brief only when the server confirms that at least one finding is retained and every retained finding is approved. Export only approved findings, include intended use, assumptions, exact claim and evidence citations, the five questions, extraction warnings, and explicit limitations. Use native mobile sharing when available and a file download fallback otherwise.
 
 **Why:** The MVP guardrail requires a human in the loop before findings are shared. Enforcing the gate on the server prevents UI bypasses, and Markdown provides a compact, portable pilot artifact without adding PDF rendering infrastructure.
+
+## 2026-08-12 — Move authentication outside ChatGPT
+
+**Decision:** Deploy the application directly to Cloudflare Workers and replace Sites-managed ChatGPT identity headers with app-owned Supabase Auth. Offer email magic-link sign-in as the universal baseline and optionally add Google sign-in. Retain Cloudflare D1 and private R2 so the migration does not require replacing the application's database and evidence storage.
+
+**Why:** Application users should not need a ChatGPT account. Supabase Auth supports standalone JWT-based authentication, email magic links, one-time passwords, and social providers, while direct Workers deployment preserves the current mobile-first edge application and its owner-scoped D1/R2 data model. This supersedes the 2026-08-11 Sites deployment baseline; that earlier entry remains as decision history.

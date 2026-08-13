@@ -49,6 +49,12 @@ export async function getReviewer(): Promise<Reviewer | null> {
   const { data, error } = await supabase.auth.getUser();
   const user = data.user;
   if (error || !user) return null;
+  if (
+    user.is_anonymous &&
+    process.env.NEXT_PUBLIC_ENABLE_GUEST_DEMO !== "true"
+  ) {
+    return null;
+  }
 
   const fullName =
     typeof user.user_metadata?.full_name === "string"

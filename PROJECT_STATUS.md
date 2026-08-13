@@ -2,7 +2,7 @@
 
 ## Current phase
 
-MVP feature-complete locally. The end-to-end workflow runs from mobile intake through cited analysis, editable human review, approval, sharing, and decision-brief export.
+Production hardening. The end-to-end workflow runs from mobile intake through cited analysis, editable human review, approval, sharing, and decision-brief export.
 
 ## Completed
 
@@ -63,21 +63,28 @@ been deployed. No automated workflow may purchase credits, change payment
 settings, enable a paid plan, or initiate a billable model request; the owner
 must initiate any paid API usage personally.
 
-The email magic-link flow was found to loop when a mobile email client opened
-the PKCE link outside the browser that initiated sign-in. The production demo
-now uses a one-tap temporary Supabase identity instead: no email or external
-account is required, while every audit remains scoped to a unique authenticated
-user ID. The callback also accepts token-hash verification for a future
-browser-independent email flow.
+The temporary anonymous-access path is being retired in favor of Google OAuth.
+Anonymous identities are rejected when production guest access is disabled,
+and authenticated users can sign out from the application header. The callback
+continues to accept both OAuth PKCE exchanges and browser-independent token-hash
+email verification.
 
-The public demo is forced to use the conservative local analyzer even though
-the OpenAI key is configured. This prevents guest traffic from generating API
-charges. The first model-assisted audit remains intentionally owner-operated.
+Production OpenAI analysis is explicitly gated by `OPENAI_ANALYSIS_ENABLED` and
+uses GPT-5.6 Terra through the Responses API with Structured Outputs and
+`store: false`. Provider failures are returned to the user instead of silently
+substituting local results. Each authenticated reviewer is limited to three
+analysis requests per UTC day and the application to 25 per UTC day. A saved
+local result exposes a user-operated rerun action after AI analysis is enabled.
+
+The 320 px results layout now contains long extracted fragments without
+horizontal page movement. Mobile headings are smaller, the scope warning is
+placed after the workspace, and the production header includes a sign-out
+control.
 
 ## Recommended next tasks
 
-1. Complete one guest-session production smoke audit, then have the owner decide when to enable the first model-assisted audit.
-2. Add free-credit usage monitoring and keep production deploys intentional because each consumes Netlify credits.
+1. Complete Google OAuth consent and connect the resulting client to Supabase Auth.
+2. Complete one owner-initiated production OpenAI audit after confirming API credits are available.
 3. Add OCR for scanned PDFs and clearer low-text-document recovery.
 4. Add duplicate-source detection and extracted-text correction with analysis invalidation.
 5. Add route-level automated fixtures for remote HTML, text-file, and PDF packets.

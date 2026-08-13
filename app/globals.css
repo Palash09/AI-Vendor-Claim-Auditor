@@ -26,6 +26,8 @@
 
 html {
   min-width: 320px;
+  max-width: 100%;
+  overflow-x: clip;
   background: var(--paper);
   color: var(--ink);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
@@ -36,7 +38,9 @@ html {
 body {
   margin: 0;
   min-width: 320px;
+  max-width: 100%;
   min-height: 100vh;
+  overflow-x: clip;
   background:
     radial-gradient(circle at 100% 0%, rgba(217, 154, 82, 0.1), transparent 31rem),
     var(--paper);
@@ -73,7 +77,10 @@ select:focus-visible {
 }
 
 .app-shell {
+  width: 100%;
+  max-width: 100%;
   min-height: 100vh;
+  overflow-x: clip;
 }
 
 .topbar {
@@ -82,7 +89,7 @@ select:focus-visible {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 8px;
   border-bottom: 1px solid rgba(23, 62, 53, 0.12);
   background: rgba(244, 241, 234, 0.92);
   backdrop-filter: blur(14px);
@@ -101,8 +108,8 @@ select:focus-visible {
 }
 
 .brand-mark {
-  width: 42px;
-  height: 42px;
+  width: 38px;
+  height: 38px;
   display: inline-grid;
   place-items: center;
   border-radius: 12px 12px 12px 4px;
@@ -121,7 +128,7 @@ select:focus-visible {
 
 .brand strong {
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 18px;
+  font-size: 16px;
   line-height: 1.05;
 }
 
@@ -131,8 +138,16 @@ select:focus-visible {
   letter-spacing: 0.02em;
 }
 
+.reviewer-account {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
 .reviewer-chip {
-  max-width: 124px;
+  max-width: 82px;
   min-height: 44px;
   padding: 7px 10px;
   display: flex;
@@ -143,6 +158,29 @@ select:focus-visible {
   background: rgba(255,255,255,0.6);
   color: var(--ink-soft);
   font-size: 12px;
+}
+
+.reviewer-account > button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 7px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--forest-2);
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.reviewer-account > button:hover:not(:disabled) {
+  background: var(--sage-soft);
+}
+
+.reviewer-account > button:disabled {
+  cursor: wait;
+  opacity: 0.6;
 }
 
 .reviewer-chip span:first-child {
@@ -158,12 +196,13 @@ select:focus-visible {
 
 .page-frame {
   width: min(1160px, 100%);
+  max-width: 100%;
   margin: 0 auto;
   padding: 0 14px 54px;
 }
 
 .intro-panel {
-  padding: 42px 4px 28px;
+  padding: 28px 4px 20px;
 }
 
 .eyebrow,
@@ -191,8 +230,8 @@ h2 {
 h1 {
   max-width: 720px;
   margin-bottom: 16px;
-  font-size: clamp(34px, 10vw, 62px);
-  line-height: 0.98;
+  font-size: clamp(28px, 7.5vw, 48px);
+  line-height: 1.02;
   font-weight: 500;
 }
 
@@ -216,6 +255,10 @@ h1 {
   line-height: 1.5;
 }
 
+.scope-note-bottom {
+  margin: 18px 4px 0;
+}
+
 .scope-note p {
   margin: 0;
 }
@@ -234,6 +277,9 @@ h1 {
 }
 
 .workspace {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   border: 1px solid rgba(23, 62, 53, 0.14);
   border-radius: 22px;
   background: rgba(255, 254, 250, 0.7);
@@ -298,6 +344,7 @@ h1 {
 }
 
 .workspace-grid {
+  min-width: 0;
   display: grid;
 }
 
@@ -317,7 +364,7 @@ h1 {
 
 .form-heading h2 {
   margin: 0;
-  font-size: clamp(27px, 8vw, 38px);
+  font-size: clamp(23px, 6.5vw, 32px);
   line-height: 1.05;
   font-weight: 500;
 }
@@ -930,7 +977,7 @@ select:focus {
 .completion-panel h2 {
   max-width: 560px;
   margin-bottom: 12px;
-  font-size: 34px;
+  font-size: 28px;
   line-height: 1.05;
   font-weight: 500;
 }
@@ -949,6 +996,8 @@ select:focus {
 }
 
 .analysis-panel {
+  min-width: 0;
+  max-width: 100%;
   display: grid;
   gap: 24px;
 }
@@ -960,7 +1009,7 @@ select:focus {
 
 .result-header h2 {
   margin: 0;
-  font-size: clamp(30px, 9vw, 44px);
+  font-size: clamp(25px, 7vw, 38px);
   line-height: 1.02;
   font-weight: 500;
 }
@@ -1028,6 +1077,8 @@ select:focus {
 
 .finding-section,
 .question-section {
+  min-width: 0;
+  max-width: 100%;
   display: grid;
   gap: 14px;
 }
@@ -1073,6 +1124,8 @@ select:focus {
 }
 
 .finding-card {
+  min-width: 0;
+  max-width: 100%;
   padding: 16px;
   display: grid;
   gap: 14px;
@@ -1131,6 +1184,7 @@ select:focus {
   font-size: 20px;
   line-height: 1.35;
   font-weight: 500;
+  overflow-wrap: anywhere;
 }
 
 .finding-rationale,
@@ -1333,11 +1387,16 @@ select:focus {
 }
 
 .source-viewer {
+  min-width: 0;
+  max-width: 100%;
   display: grid;
   gap: 12px;
 }
 
 .source-group {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   border: 1px solid var(--line);
   border-radius: var(--radius-small);
   background: #fff;
@@ -1385,6 +1444,9 @@ select:focus {
 }
 
 .fragment-list {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   max-height: 460px;
   padding: 0 10px 10px;
   display: grid;
@@ -1394,6 +1456,9 @@ select:focus {
 }
 
 .fragment-list article {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   padding: 12px;
   border: 1px solid var(--line);
   border-radius: 9px;
@@ -1422,6 +1487,8 @@ select:focus {
   color: var(--ink-soft);
   font-size: 12px;
   line-height: 1.6;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .source-empty {
@@ -1481,6 +1548,33 @@ select:focus {
   line-height: 1.55;
 }
 
+.local-analysis-note {
+  padding: 14px;
+  display: grid;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-small);
+  background: var(--sage-soft);
+}
+
+.local-analysis-note strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--forest);
+  font-size: 12px;
+}
+
+.local-analysis-note p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.local-analysis-note .secondary-button {
+  width: 100%;
+}
+
 .loading-screen {
   min-height: 100vh;
   display: grid;
@@ -1525,7 +1619,7 @@ footer {
 }
 
 .signin-card h1 {
-  font-size: clamp(34px, 10vw, 48px);
+  font-size: clamp(28px, 8vw, 40px);
 }
 
 .signin-form {
@@ -1548,7 +1642,8 @@ footer {
 
 .signin-form button,
 .secondary-signin,
-.guest-signin {
+.guest-signin,
+.google-signin {
   min-height: 48px;
   padding: 0 16px;
   border: 0;
@@ -1557,6 +1652,25 @@ footer {
   color: #fff;
   font-weight: 800;
   cursor: pointer;
+}
+
+.google-signin {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.google-signin span {
+  width: 24px;
+  height: 24px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff;
+  color: #4285f4;
+  font-weight: 900;
 }
 
 .signin-form button:disabled,
@@ -1602,6 +1716,15 @@ footer {
 
   .reviewer-chip {
     max-width: 240px;
+  }
+
+  .reviewer-account {
+    gap: 8px;
+  }
+
+  .reviewer-account > button {
+    padding-inline: 12px;
+    font-size: 11px;
   }
 
   .brand small {

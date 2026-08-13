@@ -66,12 +66,14 @@ export async function analyzeEvidence(
     OPENAI_ANALYSIS_ENABLED: process.env.OPENAI_ANALYSIS_ENABLED,
     OPENAI_API_KEY: process.env.OPENAI_API_KEY,
   });
-  if (apiKey && fragments.length > 0) {
-    try {
-      return await analyzeWithOpenAI(apiKey, audit, fragments);
-    } catch (error) {
-      console.error("OpenAI analysis failed; using the local guarded fallback.", error);
+  if (process.env.OPENAI_ANALYSIS_ENABLED === "true") {
+    if (!apiKey) {
+      throw new Error("OpenAI analysis is enabled but its API key is unavailable.");
     }
+    if (fragments.length === 0) {
+      throw new Error("No readable supplied evidence was available for analysis.");
+    }
+    return analyzeWithOpenAI(apiKey, audit, fragments);
   }
   return analyzeDeterministically(audit, fragments);
 }
@@ -98,6 +100,8 @@ async function analyzeWithOpenAI(
     body: JSON.stringify({
       model,
       store: false,
+      reasoning: { effort: "low" },
+      max_output_tokens: 8_000,
       input: [
         {
           role: "system",

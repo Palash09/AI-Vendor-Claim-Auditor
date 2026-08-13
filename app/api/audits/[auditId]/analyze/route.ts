@@ -1,8 +1,14 @@
-import { and, eq } from "drizzle-orm";
+import { and, count, eq, gte } from "drizzle-orm";
 import { getReviewer } from "@/app/reviewer-auth";
 import { getDb } from "@/db";
 import { ensureSchema } from "@/db/ensure-schema";
-import { analysisResults, audits, sourceFragments, sources } from "@/db/schema";
+import {
+  analysisResults,
+  analysisRuns,
+  audits,
+  sourceFragments,
+  sources,
+} from "@/db/schema";
 import { analyzeEvidence } from "@/lib/analyze-evidence";
 import { toAnalysisRecord } from "@/lib/analysis-storage";
 import { extractAuditEvidence } from "@/lib/evidence-extraction";
@@ -10,6 +16,11 @@ import { jsonError } from "@/lib/http";
 import { refreshedExpiry } from "@/lib/retention";
 
 type RouteContext = { params: Promise<{ auditId: string }> };
+
+const DAILY_REVIEWER_ANALYSIS_LIMIT = 3;
+const DAILY_APPLICATION_ANALYSIS_LIMIT = 25;
+
+class AnalysisQuotaError extends Error {}
 
 export async function POST(_request: Request, context: RouteContext) {
   const user = await getReviewer();
@@ -62,6 +73,42 @@ export async function POST(_request: Request, context: RouteContext) {
       .set({ status: "analyzing", updatedAt: new Date().toISOString() })
       .where(and(eq(audits.id, auditId), eq(audits.ownerId, user.userId)));
 
+    if (process.env.OPENAI_ANALYSIS_ENABLED === "true") {
+      const requestedAt = new Date().toISOString();
+      const dayStart = `${requestedAt.slice(0, 10)}T00:00:00.000Z`;
+      const [[reviewerUsage], [applicationUsage]] = await Promise.all([
+        db
+          .select({ value: count() })
+          .from(analysisRuns)
+          .where(
+            and(
+              eq(analysisRuns.ownerId, user.userId),
+              gte(analysisRuns.requestedAt, dayStart),
+            ),
+          ),
+        db
+          .select({ value: count() })
+          .from(analysisRuns)
+          .where(gte(analysisRuns.requestedAt, dayStart)),
+      ]);
+      if (reviewerUsage.value >= DAILY_REVIEWER_ANALYSIS_LIMIT) {
+        throw new AnalysisQuotaError(
+          "You have reached today’s three-analysis limit. Your packet is saved; try again tomorrow.",
+        );
+      }
+      if (applicationUsage.value >= DAILY_APPLICATION_ANALYSIS_LIMIT) {
+        throw new AnalysisQuotaError(
+          "The application has reached today’s analysis capacity. Your packet is saved; try again tomorrow.",
+        );
+      }
+      await db.insert(analysisRuns).values({
+        id: crypto.randomUUID(),
+        auditId,
+        ownerId: user.userId,
+        requestedAt,
+      });
+    }
+
     const generated = await analyzeEvidence(audit, extraction.fragments);
     const now = new Date();
     const record = toAnalysisRecord(
@@ -112,6 +159,9 @@ export async function POST(_request: Request, context: RouteContext) {
       .set({ status: "failed", updatedAt: new Date().toISOString() })
       .where(and(eq(audits.id, auditId), eq(audits.ownerId, user.userId)));
     console.error("Audit analysis failed", error);
+    if (error instanceof AnalysisQuotaError) {
+      return jsonError(error.message, 429);
+    }
     return jsonError(
       "Analysis could not complete. Your packet is still saved; try again.",
       500,

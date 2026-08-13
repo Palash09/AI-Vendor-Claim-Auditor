@@ -113,3 +113,9 @@
 **Decision:** During MVP testing, make a one-tap Supabase anonymous session the primary access path and hide email magic-link sign-in. Keep each audit scoped to the resulting authenticated user ID. Force the public demo to use the conservative local analyzer even when an OpenAI key is configured.
 
 **Why:** Email magic links using PKCE can fail when a mobile email client opens the link in a different browser context. Anonymous Supabase users still receive unique authenticated identities, so the application can preserve owner isolation without collecting an email address. Disabling model calls prevents guest traffic from creating OpenAI charges. Google sign-in and a browser-independent token-hash email callback remain available as later permanent-account paths.
+
+## 2026-08-13 — Promote Google OAuth and bounded OpenAI analysis to production
+
+**Decision:** Retire anonymous access from the production path, make Google OAuth the primary sign-in method, expose sign-out in the application, and enable user-initiated OpenAI analysis. Reject provider failures instead of silently returning local results. Limit each reviewer to three analysis requests per UTC day and the application to 25 per UTC day.
+
+**Why:** A production application needs durable cross-device identity, clear session control, and truthful execution state. Daily database-backed limits constrain public API exposure without adding a paid gateway or enterprise administration layer. The user still initiates each billable model request by pressing the analysis button; automated tests and deployment checks do not call the model.

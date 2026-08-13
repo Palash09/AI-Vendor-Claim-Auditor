@@ -43,7 +43,7 @@ export async function POST(request: Request, context: RouteContext) {
     );
 
   if ((sourceCount?.value ?? 0) >= MAX_SOURCE_COUNT) {
-    return jsonError("This MVP accepts up to three supporting sources.", 409);
+    return jsonError("You can add up to three supporting sources.", 409);
   }
 
   const contentType = request.headers.get("content-type") ?? "";

@@ -17,7 +17,8 @@ export default async function SignInPage({
       <SignInForm
         returnTo={safeReturnPath(returnTo)}
         enableGuestDemo={process.env.NEXT_PUBLIC_ENABLE_GUEST_DEMO === "true"}
-        initialMessage={error ? "That sign-in link could not be verified. Try the demo or request a new link." : null}
+        enableGoogleAuth={process.env.NEXT_PUBLIC_ENABLE_GOOGLE_AUTH === "true"}
+        initialMessage={error ? "That sign-in could not be verified. Please try again." : null}
       />
     </main>
   );

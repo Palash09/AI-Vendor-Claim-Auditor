@@ -112,3 +112,20 @@ export const sourceFragments = pgTable(
     index("idx_source_fragments_owner").on(table.ownerId),
   ],
 );
+
+export const analysisRuns = pgTable(
+  "analysis_runs",
+  {
+    id: text("id").primaryKey(),
+    auditId: text("audit_id").notNull(),
+    ownerId: text("owner_id").notNull(),
+    requestedAt: text("requested_at").notNull(),
+  },
+  (table) => [
+    index("idx_analysis_runs_owner_requested").on(
+      table.ownerId,
+      table.requestedAt,
+    ),
+    index("idx_analysis_runs_requested").on(table.requestedAt),
+  ],
+);

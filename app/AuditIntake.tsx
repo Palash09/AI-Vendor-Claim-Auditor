@@ -2,6 +2,7 @@
 
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { ReviewerAccount } from "./ReviewerAccount";
 
 type Sensitivity = "public" | "internal" | "confidential" | "regulated";
 type Impact = "low" | "medium" | "high";
@@ -130,7 +131,13 @@ const IMPACT_OPTIONS: Array<{
   { value: "high", label: "High", detail: "Material customer or business impact" },
 ];
 
-export function AuditIntake({ reviewerName }: { reviewerName: string }) {
+export function AuditIntake({
+  reviewerName,
+  aiAnalysisEnabled = false,
+}: {
+  reviewerName: string;
+  aiAnalysisEnabled?: boolean;
+}) {
   const [step, setStep] = useState(1);
   const [audit, setAudit] = useState<AuditRecord | null>(null);
   const [sources, setSources] = useState<SourceRecord[]>([]);
@@ -560,10 +567,7 @@ export function AuditIntake({ reviewerName }: { reviewerName: string }) {
             <small>AI vendor evidence review</small>
           </span>
         </Link>
-        <div className="reviewer-chip" title={reviewerName}>
-          <span aria-hidden="true">●</span>
-          <span>{reviewerName}</span>
-        </div>
+        <ReviewerAccount reviewerName={reviewerName} />
       </header>
 
       <div className="page-frame">
@@ -574,13 +578,6 @@ export function AuditIntake({ reviewerName }: { reviewerName: string }) {
             Add one product and a small evidence packet. You’ll get a cited,
             reviewable ledger of what the supplied materials do—and do not—support.
           </p>
-          <div className="scope-note">
-            <span className="scope-icon" aria-hidden="true">i</span>
-            <p>
-              This tool assesses supplied evidence. It does not certify compliance,
-              safety, or whether a vendor is truthful.
-            </p>
-          </div>
         </section>
 
         <section className="workspace" aria-label="Audit intake">
@@ -632,6 +629,8 @@ export function AuditIntake({ reviewerName }: { reviewerName: string }) {
                   onShare={() => void shareBrief()}
                   onDownload={() => void downloadBrief()}
                   onStartOver={deleteDraft}
+                  onAnalyze={() => void startAnalysis()}
+                  aiAnalysisEnabled={aiAnalysisEnabled}
                 />
               ) : complete ? (
                 <CompletionPanel
@@ -895,11 +894,20 @@ export function AuditIntake({ reviewerName }: { reviewerName: string }) {
             </aside>
           </div>
         </section>
+
+        <div className="scope-note scope-note-bottom">
+          <span className="scope-icon" aria-hidden="true">i</span>
+          <p>
+            This tool assesses only the supplied evidence. It does not certify
+            compliance or safety, determine whether a vendor is truthful, or make
+            a purchasing decision.
+          </p>
+        </div>
       </div>
 
       <footer>
         <span>Evidence status is not a legal, compliance, safety, or purchasing verdict.</span>
-        <span>Claim Auditor · MVP</span>
+        <span>Claim Auditor</span>
       </footer>
     </main>
   );
@@ -1080,6 +1088,8 @@ function AnalysisPanel({
   onShare,
   onDownload,
   onStartOver,
+  onAnalyze,
+  aiAnalysisEnabled,
 }: {
   analysis: AnalysisRecord;
   audit: AuditRecord | null;
@@ -1091,6 +1101,8 @@ function AnalysisPanel({
   onShare: () => void;
   onDownload: () => void;
   onStartOver: () => void;
+  onAnalyze: () => void;
+  aiAnalysisEnabled: boolean;
 }) {
   const [activeFragmentId, setActiveFragmentId] = useState<string | null>(null);
   const visibleFindings = analysis.findings.filter(
@@ -1124,7 +1136,7 @@ function AnalysisPanel({
           <h2>{audit?.vendorName} evidence gaps</h2>
         </div>
         <span className="result-mode">
-          {analysis.mode === "openai" ? "AI-assisted" : "Local demo analysis"}
+          {analysis.mode === "openai" ? "AI-assisted" : "Local analysis"}
         </span>
       </header>
 
@@ -1135,12 +1147,6 @@ function AnalysisPanel({
           {removedFindings.length ? ` · ${removedFindings.length} removed` : ""}
         </span>
       </div>
-
-      {analysis.mode === "demo" ? (
-        <div className="message notice-message" role="note">
-          AI analysis is disabled for this demo, so this run used the conservative local analyzer. It only surfaces cited claims and treats missing separate support as an evidence gap.
-        </div>
-      ) : null}
 
       {analysis.extractionWarnings.length ? (
         <details className="warning-details">
@@ -1234,6 +1240,23 @@ function AnalysisPanel({
           </button>
         )}
       </section>
+
+      {analysis.mode === "demo" ? (
+        <div className="local-analysis-note" role="note">
+          <div>
+            <strong>Previous local analysis</strong>
+            <p>
+              This saved result was created before AI-assisted analysis was enabled.
+              Run it again to replace these findings with a cited OpenAI analysis.
+            </p>
+          </div>
+          {aiAnalysisEnabled ? (
+            <button className="secondary-button" type="button" onClick={onAnalyze} disabled={busy}>
+              {busy ? "Running AI analysis…" : "Run AI-assisted analysis"}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
 
       <div className="result-boundary">
         Human review is required before sharing. This analyzes only supplied materials and is not a legal, compliance, safety, or purchasing verdict.

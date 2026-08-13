@@ -6,10 +6,12 @@ import { useState } from "react";
 export function SignInForm({
   returnTo,
   enableGuestDemo = false,
+  enableGoogleAuth = false,
   initialMessage = null,
 }: {
   returnTo: string;
   enableGuestDemo?: boolean;
+  enableGoogleAuth?: boolean;
   initialMessage?: string | null;
 }) {
   const [email, setEmail] = useState("");
@@ -74,11 +76,13 @@ export function SignInForm({
   return (
     <div className="signin-card">
       <p className="eyebrow">Private evidence workspace</p>
-      <h1>Sign in to review a vendor.</h1>
+      <h1>Sign in to Claim Auditor.</h1>
       <p className="intro-copy">
         {enableGuestDemo
           ? "No account is required. Continue with a temporary private demo session."
-          : "Use any email address. We will send a one-time secure link—no ChatGPT account is required."}
+          : enableGoogleAuth
+            ? "Use your Google account to keep every audit private and available across devices."
+            : "Use any email address. We will send a one-time secure link—no ChatGPT account is required."}
       </p>
       {enableGuestDemo ? (
         <>
@@ -96,7 +100,13 @@ export function SignInForm({
           </p>
         </>
       ) : null}
-      {!enableGuestDemo ? (
+      {!enableGuestDemo && enableGoogleAuth ? (
+        <button className="google-signin" type="button" onClick={signInWithGoogle}>
+          <span aria-hidden="true">G</span>
+          Continue with Google
+        </button>
+      ) : null}
+      {!enableGuestDemo && !enableGoogleAuth ? (
         <form onSubmit={sendMagicLink} className="signin-form">
           <label htmlFor="email">Email address</label>
           <input
@@ -112,11 +122,6 @@ export function SignInForm({
             {busy ? "Sending…" : "Email me a sign-in link"}
           </button>
         </form>
-      ) : null}
-      {process.env.NEXT_PUBLIC_ENABLE_GOOGLE_AUTH === "true" ? (
-        <button className="secondary-signin" type="button" onClick={signInWithGoogle}>
-          Continue with Google
-        </button>
       ) : null}
       {message ? <p className="signin-message" role="status">{message}</p> : null}
     </div>

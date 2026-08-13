@@ -36,6 +36,30 @@ test("renders one-tap guest demo access without requiring email", () => {
   assert.doesNotMatch(html, /sign in with ChatGPT/i);
 });
 
+test("renders Google as the production sign-in path", () => {
+  const html = renderToStaticMarkup(
+    React.createElement(SignInForm, {
+      returnTo: "/",
+      enableGoogleAuth: true,
+    }),
+  );
+
+  assert.match(html, /Continue with Google/i);
+  assert.doesNotMatch(html, /Continue to the demo/i);
+  assert.doesNotMatch(html, /Email me a sign-in link/i);
+});
+
+test("keeps long source fragments inside the mobile viewport", async () => {
+  const css = await readFile(
+    new URL("../app/globals.css", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(css, /\.fragment-list article\s*\{[^}]*min-width:\s*0/s);
+  assert.match(css, /\.fragment-list p,[^}]*overflow-wrap:\s*anywhere/s);
+  assert.match(css, /body\s*\{[^}]*overflow-x:\s*clip/s);
+});
+
 test("supports browser-independent token-hash email callbacks", async () => {
   const callback = await readFile(
     new URL("../app/auth/callback/route.ts", import.meta.url),
@@ -55,6 +79,22 @@ test("requires an explicit billing-boundary flag before using the OpenAI key", (
     getOpenAIAnalysisKey({ OPENAI_API_KEY: "secret", OPENAI_ANALYSIS_ENABLED: "true" }),
     "secret",
   );
+});
+
+test("does not silently replace a failed production AI request with local results", async () => {
+  const source = await readFile(
+    new URL("../lib/analyze-evidence.ts", import.meta.url),
+    "utf8",
+  );
+  const route = await readFile(
+    new URL("../app/api/audits/[auditId]/analyze/route.ts", import.meta.url),
+    "utf8",
+  );
+
+  assert.doesNotMatch(source, /OpenAI analysis failed; using the local guarded fallback/);
+  assert.match(source, /return analyzeWithOpenAI\(apiKey, audit, fragments\)/);
+  assert.match(route, /DAILY_REVIEWER_ANALYSIS_LIMIT\s*=\s*3/);
+  assert.match(route, /DAILY_APPLICATION_ANALYSIS_LIMIT\s*=\s*25/);
 });
 
 test("rejects external and protocol-relative authentication return paths", () => {

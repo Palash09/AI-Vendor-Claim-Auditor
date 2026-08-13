@@ -12,7 +12,7 @@ The product accepts a small vendor evidence packet and produces a cited claim le
 
 ## Current status
 
-The local MVP now supports autosaved mobile intake, document extraction, cited claim-gap analysis, persisted source viewing, editable human review, five vendor questions, a server-enforced approval gate, native sharing, and downloadable decision-brief export.
+The production application supports Google-authenticated, autosaved mobile intake; document extraction; cited OpenAI claim-gap analysis; persisted source viewing; editable human review; five vendor questions; a server-enforced approval gate; native sharing; and downloadable decision-brief export.
 
 Start with:
 
@@ -60,19 +60,19 @@ npm run verify
 The application works without an OpenAI API key by using a clearly labeled,
 conservative local analyzer. Copy `.env.example` to `.env.local` for local
 configuration. Netlify injects `NETLIFY_DB_URL` when its managed database is
-enabled; Supabase provides the public URL and publishable key used by email
-magic-link authentication. Never commit real credentials.
+enabled; Supabase provides the public URL and publishable key used by Google
+OAuth. Never commit real credentials.
 
 Production uses Netlify Free, Netlify Database, and private Netlify Blobs. Keep
 the free plan's hard monthly credit limit and do not enable paid auto recharge.
 
 ## Analysis modes
 
-- **Local demo analysis:** no API key required; extracts exact cited claims and
+- **Local development analysis:** no API key required; extracts exact cited claims and
   treats the absence of separate support as an evidence gap.
 - **Model-assisted analysis:** uses the OpenAI Responses API to compare claims
   with supplied evidence across the five MVP domains. Every retained result is
-  still schema-validated, citation-checked, and subject to human approval.
+  still schema-validated, citation-checked, rate-limited, and subject to human approval.
 
 ## Using this folder in Codex
 

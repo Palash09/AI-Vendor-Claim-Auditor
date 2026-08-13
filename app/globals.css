@@ -660,6 +660,12 @@ select:focus {
   font-weight: 800;
 }
 
+.counter-ring.is-complete {
+  border-color: var(--forest-2);
+  background: var(--forest-2);
+  color: #fff !important;
+}
+
 .source-list {
   display: grid;
   gap: 8px;

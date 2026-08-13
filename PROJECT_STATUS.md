@@ -81,6 +81,11 @@ horizontal page movement. Mobile headings are smaller, the scope warning is
 placed after the workspace, and the production header includes a sign-out
 control.
 
+Extracted fragment identifiers are scoped to their audit so repeated product
+page locations cannot collide across reviews. The completed three-source
+packet indicator renders as a fully filled circle. Analysis failures log only
+the error class and provider/database code, never extracted evidence text.
+
 ## Recommended next tasks
 
 1. Complete Google OAuth consent and connect the resulting client to Supabase Auth.

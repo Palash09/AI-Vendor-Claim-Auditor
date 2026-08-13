@@ -60,6 +60,20 @@ test("keeps long source fragments inside the mobile viewport", async () => {
   assert.match(css, /body\s*\{[^}]*overflow-x:\s*clip/s);
 });
 
+test("fully fills the three-of-three source indicator", async () => {
+  const css = await readFile(
+    new URL("../app/globals.css", import.meta.url),
+    "utf8",
+  );
+  const intake = await readFile(
+    new URL("../app/AuditIntake.tsx", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(intake, /sources\.length === 3 \? " is-complete"/);
+  assert.match(css, /\.counter-ring\.is-complete\s*\{[^}]*background:\s*var\(--forest-2\)/s);
+});
+
 test("supports browser-independent token-hash email callbacks", async () => {
   const callback = await readFile(
     new URL("../app/auth/callback/route.ts", import.meta.url),
@@ -105,6 +119,16 @@ test("does not silently replace a failed production AI request with local result
   assert.match(source, /return analyzeWithOpenAI\(apiKey, audit, fragments\)/);
   assert.match(route, /DAILY_REVIEWER_ANALYSIS_LIMIT\s*=\s*3/);
   assert.match(route, /DAILY_APPLICATION_ANALYSIS_LIMIT\s*=\s*25/);
+});
+
+test("does not write extracted evidence into analysis error logs", async () => {
+  const analysisRoute = await readFile(
+    new URL("../app/api/audits/[auditId]/analyze/route.ts", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(analysisRoute, /analysisFailureMetadata\(error\)/);
+  assert.doesNotMatch(analysisRoute, /console\.error\([^\n]*,\s*error\s*\)/);
 });
 
 test("rejects external and protocol-relative authentication return paths", () => {

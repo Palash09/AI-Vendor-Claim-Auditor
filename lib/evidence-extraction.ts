@@ -75,9 +75,22 @@ export async function extractAuditEvidence(
   }
 
   return {
-    fragments: documents.flatMap((document) => fragmentDocument(document)),
+    fragments: scopeEvidenceFragments(
+      audit.id,
+      documents.flatMap((document) => fragmentDocument(document)),
+    ),
     warnings,
   };
+}
+
+export function scopeEvidenceFragments(
+  auditId: string,
+  fragments: EvidenceFragment[],
+): EvidenceFragment[] {
+  return fragments.map((fragment) => ({
+    ...fragment,
+    id: `${auditId}:${fragment.id}`,
+  }));
 }
 
 async function addUrlDocument(

@@ -119,3 +119,9 @@
 **Decision:** Retire anonymous access from the production path, make Google OAuth the primary sign-in method, expose sign-out in the application, and enable user-initiated OpenAI analysis. Reject provider failures instead of silently returning local results. Limit each reviewer to three analysis requests per UTC day and the application to 25 per UTC day.
 
 **Why:** A production application needs durable cross-device identity, clear session control, and truthful execution state. Daily database-backed limits constrain public API exposure without adding a paid gateway or enterprise administration layer. The user still initiates each billable model request by pressing the analysis button; automated tests and deployment checks do not call the model.
+
+## 2026-08-13 — Scope extracted fragment identifiers to each audit
+
+**Decision:** Prefix every deterministic extraction-fragment identifier with the owning audit identifier before persistence and model analysis.
+
+**Why:** Product-page fragments reuse stable source locations such as `product-url-p1-1`. A globally unique database key caused later audits to collide with earlier reviews before analysis could begin. Audit-scoped identifiers preserve deterministic, inspectable citations without cross-review collisions.

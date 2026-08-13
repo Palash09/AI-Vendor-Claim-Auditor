@@ -743,7 +743,12 @@ export function AuditIntake({
                       <strong>{sources.length} of 3 sources</strong>
                       <span>{sourceSlots > 0 ? `${sourceSlots} slots available` : "Packet limit reached"}</span>
                     </div>
-                    <span className="counter-ring" aria-hidden="true">{sources.length}/3</span>
+                    <span
+                      className={`counter-ring${sources.length === 3 ? " is-complete" : ""}`}
+                      aria-hidden="true"
+                    >
+                      {sources.length}/3
+                    </span>
                   </div>
 
                   {sources.length > 0 ? (

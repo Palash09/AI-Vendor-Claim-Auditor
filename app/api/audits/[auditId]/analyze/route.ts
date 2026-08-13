@@ -158,7 +158,7 @@ export async function POST(_request: Request, context: RouteContext) {
       .update(audits)
       .set({ status: "failed", updatedAt: new Date().toISOString() })
       .where(and(eq(audits.id, auditId), eq(audits.ownerId, user.userId)));
-    console.error("Audit analysis failed", error);
+    console.error("Audit analysis failed", analysisFailureMetadata(error));
     if (error instanceof AnalysisQuotaError) {
       return jsonError(error.message, 429);
     }
@@ -167,4 +167,17 @@ export async function POST(_request: Request, context: RouteContext) {
       500,
     );
   }
+}
+
+function analysisFailureMetadata(error: unknown) {
+  const cause =
+    error instanceof Error && error.cause && typeof error.cause === "object"
+      ? error.cause
+      : null;
+  const code = cause && "code" in cause ? String(cause.code) : null;
+
+  return {
+    name: error instanceof Error ? error.name : "UnknownError",
+    code,
+  };
 }

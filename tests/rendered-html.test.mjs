@@ -70,6 +70,16 @@ test("supports browser-independent token-hash email callbacks", async () => {
   assert.match(callback, /verifyOtp/);
 });
 
+test("removes one-time OAuth parameters after an authenticated redirect", async () => {
+  const reviewerAccount = await readFile(
+    new URL("../app/ReviewerAccount.tsx", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(reviewerAccount, /searchParams\.delete\("code"\)/);
+  assert.match(reviewerAccount, /history\.replaceState/);
+});
+
 test("requires an explicit billing-boundary flag before using the OpenAI key", () => {
   assert.equal(
     getOpenAIAnalysisKey({ OPENAI_API_KEY: "secret", OPENAI_ANALYSIS_ENABLED: "false" }),

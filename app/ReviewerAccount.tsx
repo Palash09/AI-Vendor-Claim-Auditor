@@ -1,12 +1,21 @@
 "use client";
 
 import { createBrowserClient } from "@supabase/ssr";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const ACTIVE_AUDIT_KEY = "claim-auditor-active-audit";
 
 export function ReviewerAccount({ reviewerName }: { reviewerName: string }) {
   const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    const currentUrl = new URL(window.location.href);
+    if (!currentUrl.searchParams.has("code")) return;
+
+    currentUrl.searchParams.delete("code");
+    currentUrl.searchParams.delete("returnTo");
+    window.history.replaceState(null, "", currentUrl);
+  }, []);
 
   async function signOut() {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;

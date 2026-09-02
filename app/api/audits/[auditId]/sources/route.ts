@@ -9,8 +9,8 @@ import { jsonError, validationError } from "@/lib/http";
 import { refreshedExpiry } from "@/lib/retention";
 
 const MAX_SOURCE_COUNT = 3;
-// Netlify Functions base64-encode binary requests and effectively cap them at
-// about 4.5 MB. Keep room for multipart form metadata.
+// Vercel Functions accept request payloads up to 4.5 MB. Keep room for
+// multipart form metadata.
 const MAX_FILE_BYTES = 4 * 1_024 * 1_024;
 const ACCEPTED_FILE_TYPES = new Set([
   "application/pdf",

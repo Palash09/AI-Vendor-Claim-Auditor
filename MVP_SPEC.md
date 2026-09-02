@@ -27,8 +27,8 @@ Up to three supporting documents or URLs, such as:
 - Evaluation report
 - Written sales response
 
-Pilot uploads are limited to 4 MB per file so binary requests remain within
-Netlify Free's function payload ceiling.
+Pilot uploads are limited to 4 MB per file so multipart requests remain within
+Vercel Functions' 4.5 MB request-payload ceiling.
 
 ## Claim domains
 
@@ -132,7 +132,7 @@ Keep the first implementation simple:
 - Short-lived hosted storage with immediate deletion, 72-hour inactivity expiry, and a seven-day hard maximum
 - No background jobs unless document size makes them necessary
 
-The selected baseline is a TypeScript application using native Next.js App Router on Netlify, Supabase Auth, Netlify Database (Postgres) with Drizzle ORM, private Netlify Blobs, Zod schemas, PDF.js and Readability-based extraction, and the OpenAI Responses API behind a provider adapter. The pilot stays on Netlify's free plan with its hard monthly credit limit. See [ROADMAP.md](ROADMAP.md) for the complete engineering and mobile requirements.
+The selected baseline is a TypeScript application using native Next.js App Router on Vercel, Supabase Auth and pooled Postgres with Drizzle ORM, private Vercel Blob storage, Zod schemas, PDF.js and Readability-based extraction, and the OpenAI Responses API behind a provider adapter. The Vercel Hobby deployment is limited to this personal, non-commercial pilot. See [ROADMAP.md](ROADMAP.md) for the complete engineering and mobile requirements.
 
 ## Mobile-first requirement
 

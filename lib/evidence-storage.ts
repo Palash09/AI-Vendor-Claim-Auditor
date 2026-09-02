@@ -1,33 +1,39 @@
-import { getStore } from "@netlify/blobs";
-
-const STORE_NAME = "private-evidence-files";
-
-function evidenceStore() {
-  return getStore({ name: STORE_NAME, consistency: "strong" });
-}
+import { del, get, put } from "@vercel/blob";
 
 export async function putEvidenceFile(
   key: string,
   file: File,
   metadata: { ownerId: string; auditId: string },
 ) {
-  await evidenceStore().set(key, await file.arrayBuffer(), {
-    metadata: {
-      ...metadata,
-      contentType: file.type,
-      originalFileName: file.name,
-    },
+  const expectedPrefix = `audits/${metadata.auditId}/`;
+  if (!key.startsWith(expectedPrefix)) {
+    throw new Error("Evidence storage key does not match its audit.");
+  }
+
+  await put(key, file, {
+    access: "private",
+    addRandomSuffix: false,
+    allowOverwrite: false,
+    cacheControlMaxAge: 60,
+    contentType: file.type,
   });
 }
 
 export async function getEvidenceFile(key: string): Promise<ArrayBuffer> {
-  return evidenceStore().get(key, { type: "arrayBuffer" });
+  const result = await get(key, { access: "private" });
+  if (!result || result.statusCode !== 200) {
+    throw new Error("Evidence file is unavailable.");
+  }
+
+  return new Response(result.stream).arrayBuffer();
 }
 
 export async function deleteEvidenceFile(key: string): Promise<void> {
-  await evidenceStore().delete(key);
+  await del(key);
 }
 
 export async function deleteEvidenceFiles(keys: string[]): Promise<void> {
-  await Promise.all(keys.map((key) => deleteEvidenceFile(key)));
+  if (keys.length > 0) {
+    await del(keys);
+  }
 }

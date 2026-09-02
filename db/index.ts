@@ -1,4 +1,3 @@
-import { getConnectionString } from "@netlify/database";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "./schema";
@@ -12,12 +11,10 @@ export function getDb() {
 
 function createDatabase() {
   const connectionString =
-    process.env.NETLIFY_DB_URL ??
-    process.env.DATABASE_URL ??
-    getConnectionString();
+    process.env.POSTGRES_URL ?? process.env.DATABASE_URL;
   if (!connectionString) {
     throw new Error(
-      "Netlify Database is unavailable. Run through `netlify dev` or set NETLIFY_DB_URL for local development.",
+      "Postgres is unavailable. Set POSTGRES_URL or DATABASE_URL.",
     );
   }
 

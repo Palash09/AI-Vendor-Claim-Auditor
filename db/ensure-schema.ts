@@ -1,4 +1,4 @@
 export function ensureSchema(): Promise<void> {
-  // Netlify applies versioned SQL migrations during deploy and `netlify dev`.
+  // Production migrations are applied explicitly with `npm run db:migrate`.
   return Promise.resolve();
 }

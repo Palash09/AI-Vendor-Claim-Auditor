@@ -125,3 +125,19 @@
 **Decision:** Prefix every deterministic extraction-fragment identifier with the owning audit identifier before persistence and model analysis.
 
 **Why:** Product-page fragments reuse stable source locations such as `product-url-p1-1`. A globally unique database key caused later audits to collide with earlier reviews before analysis could begin. Audit-scoped identifiers preserve deterministic, inspectable citations without cross-review collisions.
+
+## 2026-09-02 — Move the personal pilot from Netlify to Vercel
+
+**Decision:** Deploy the personal, non-commercial pilot on Vercel Hobby, keep
+Supabase Auth, move relational state to the existing Supabase Postgres project,
+and replace private Netlify Blobs with private Vercel Blob storage. Apply
+versioned SQL migrations explicitly and keep `aiauditor.palasharma.com` as the
+canonical hostname. Do not start a Pro trial, add a payment method, or enable
+paid usage through an automated workflow.
+
+**Why:** Netlify paused the team after 19 production deploys and normal runtime
+traffic consumed 357.4 of the Free plan's 300 monthly credits. Vercel is the
+verified Next.js deployment target and private Blob storage provides the
+smallest reversible replacement for uploaded evidence. Vercel Hobby permits
+only personal, non-commercial use, so commercial operation remains out of
+scope until the owner explicitly selects and purchases an eligible host plan.

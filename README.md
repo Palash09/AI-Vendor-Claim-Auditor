@@ -59,12 +59,13 @@ npm run verify
 
 The application works without an OpenAI API key by using a clearly labeled,
 conservative local analyzer. Copy `.env.example` to `.env.local` for local
-configuration. Netlify injects `NETLIFY_DB_URL` when its managed database is
-enabled; Supabase provides the public URL and publishable key used by Google
-OAuth. Never commit real credentials.
+configuration. Set `POSTGRES_URL` to a pooled PostgreSQL connection; Supabase
+provides the public URL and publishable key used by Google OAuth. Never commit
+real credentials.
 
-Production uses Netlify Free, Netlify Database, and private Netlify Blobs. Keep
-the free plan's hard monthly credit limit and do not enable paid auto recharge.
+Production uses Vercel, Supabase Auth and Postgres, and private Vercel Blob
+storage. The free Hobby deployment is for this personal, non-commercial pilot
+only; do not start a paid plan or trial through automated workflows.
 
 ## Analysis modes
 

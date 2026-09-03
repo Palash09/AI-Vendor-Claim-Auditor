@@ -39,29 +39,27 @@ Production hardening. The end-to-end workflow runs from mobile intake through ci
 
 ## Hosting transition
 
-The application has been migrated locally from the ChatGPT/Sites and Cloudflare
-runtime to native Next.js for Netlify. It now uses app-owned Supabase Auth
-(email magic link first, Google optional), Netlify Database, and private Netlify
-Blobs. The production build no longer requires Vinext, D1, R2, Wrangler, or
-ChatGPT identity headers.
+The application has been migrated from Netlify to native Next.js on Vercel. It
+uses app-owned Supabase Auth, a Supabase Postgres database, and private Vercel
+Blob storage. The production build no longer requires Vinext, D1, R2, Wrangler,
+Netlify Database, Netlify Blobs, or ChatGPT identity headers.
 
-File uploads are capped at 4 MB because Netlify's buffered function payload is
-6 MB and binary requests gain base64 overhead. Model calls time out at 45
-seconds so the route can finish within Netlify's 60-second synchronous limit.
+The GitHub repository is connected to a Vercel Hobby project and the configured
+production deployment succeeds. A dedicated free Supabase project provides
+Google and email magic-link authentication. Its callback allow list contains
+the canonical hostname, the Vercel fallback hostname, and localhost.
 
-The GitHub repository is connected to the Netlify Free project and its first
-production deployment succeeded. Netlify Database is provisioned and the
-production migration is applied. A dedicated free Supabase project provides
-universal email magic-link authentication; its public client configuration and
-explicit callback allow list are configured in Netlify and Supabase.
+The database schema migrations are applied. Production uses a dedicated
+`aivca_app` login with only connect, schema-usage, and required table DML
+permissions; the Supabase owner credential is not stored in Vercel. Uploaded
+evidence is stored in a private Vercel Blob store.
 
 The canonical hostname is `aiauditor.palasharma.com`. Porkbun DNS points the
-hostname to Netlify, the included Let's Encrypt certificate is active, and HTTP
-redirects to HTTPS. The server-side `OPENAI_API_KEY` is stored as a protected
-Netlify secret in a dedicated OpenAI project and the completed environment has
-been deployed. No automated workflow may purchase credits, change payment
-settings, enable a paid plan, or initiate a billable model request; the owner
-must initiate any paid API usage personally.
+hostname to the Vercel-provided CNAME target. The server-side `OPENAI_API_KEY`
+is stored as a protected Vercel secret in a dedicated OpenAI project. No
+automated workflow may purchase credits, change payment settings, enable a paid
+plan, or initiate a billable model request; the owner must initiate any paid API
+usage personally.
 
 The temporary anonymous-access path is being retired in favor of Google OAuth.
 Anonymous identities are rejected when production guest access is disabled,
@@ -88,12 +86,11 @@ the error class and provider/database code, never extracted evidence text.
 
 ## Recommended next tasks
 
-1. Complete Google OAuth consent and connect the resulting client to Supabase Auth.
-2. Complete one owner-initiated production OpenAI audit after confirming API credits are available.
-3. Add OCR for scanned PDFs and clearer low-text-document recovery.
-4. Add duplicate-source detection and extracted-text correction with analysis invalidation.
-5. Add route-level automated fixtures for remote HTML, text-file, and PDF packets.
+1. Complete one owner-initiated production OpenAI audit after confirming API credits are available.
+2. Add OCR for scanned PDFs and clearer low-text-document recovery.
+3. Add duplicate-source detection and extracted-text correction with analysis invalidation.
+4. Add route-level automated fixtures for remote HTML, text-file, and PDF packets.
 
 ## First implementation milestone
 
-A reviewer can submit one evidence packet, inspect exact source fragments, edit or remove every finding, approve every retained finding, and share or download a scoped decision brief with five follow-up questions. The first implementation milestone is complete locally.
+A reviewer can submit one evidence packet, inspect exact source fragments, edit or remove every finding, approve every retained finding, and share or download a scoped decision brief with five follow-up questions. The first implementation milestone is deployed to production.

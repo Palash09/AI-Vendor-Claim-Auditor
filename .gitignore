@@ -22,3 +22,6 @@ private-data/
 audit-output/
 *.log
 *.tsbuildinfo
+.vercel/
+.env*
+!.env.example
